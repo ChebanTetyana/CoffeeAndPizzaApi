@@ -11,7 +11,19 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Laravel\Socialite\Facades\Socialite;
 use Exception;
+use OpenApi\Annotations as OA;
 
+/**
+ * @OA\Info(title="Pizza & Coffee API", version="1.0")
+ *
+ * @OA\SecurityScheme(
+ *     securityScheme="bearerAuth",
+ *     type="http",
+ *     scheme="bearer",
+ *     bearerFormat="JWT",
+ *     in="header"
+ * )
+ */
 class AuthController extends Controller
 {
     public function redirectToGoogle(): RedirectResponse
@@ -45,6 +57,27 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/register",
+     *     summary="Register new user",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"name","email","password","password_confirmation"},
+     *             @OA\Property(property="name", type="string", example="User1"),
+     *             @OA\Property(property="email", type="string", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", example="password"),
+     *             @OA\Property(property="password_confirmation", type="string", example="password")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="User registered"
+     *     )
+     * )
+     */
     public function register(AuthRequest$request): JsonResponse
     {
         try {
@@ -68,6 +101,28 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/login",
+     *     summary="User login",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", example="password")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful login",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="token", type="string", example="1|sometokenvalue")
+     *         )
+     *     )
+     * )
+     */
     public function login(AuthRequest $request): JsonResponse
     {
         try {
@@ -101,5 +156,32 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Logout successful',
         ]);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/user",
+     *     summary="Get authenticated user info",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Authenticated user",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="id", type="integer", example=1),
+     *             @OA\Property(property="name", type="string", example="Jane Doe"),
+     *             @OA\Property(property="email", type="string", example="jane@example.com"),
+     *             @OA\Property(property="created_at", type="string", example="2024-01-01T12:00:00Z")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthenticated"
+     *     )
+     * )
+     */
+    public function getUser(Request $request): JsonResponse
+    {
+        return response()->json($request->user());
     }
 }

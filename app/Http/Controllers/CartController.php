@@ -7,6 +7,7 @@ use App\Models\MenuItem;
 use App\Models\OrderItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use OpenApi\Annotations as OA;
 
 class CartController extends Controller
 {
@@ -42,6 +43,28 @@ class CartController extends Controller
         return response()->json(['message' => 'Item removed from cart']);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/cart/add",
+     *     summary="Add item to cart",
+     *     tags={"Cart"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"menu_item_id","size","price","count"},
+     *             @OA\Property(property="menu_item_id", type="integer", example=2),
+     *             @OA\Property(property="size", type="string", example="M"),
+     *             @OA\Property(property="price", type="number", format="float", example=2.99),
+     *             @OA\Property(property="count", type="integer", example=1)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Item added to cart"
+     *     )
+     * )
+     */
     public function addToCart(CartRequest $request) :JsonResponse
     {
         $userId = Auth::id();

@@ -6,9 +6,21 @@ use App\Enums\ProductType;
 use App\Http\Requests\MenuRequest;
 use App\Models\MenuItem;
 use Illuminate\Http\JsonResponse;
+use OpenApi\Annotations as OA;
 
 class MenuController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/menu",
+     *     summary="Get all menu items",
+     *     tags={"Menu"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of menu items"
+     *     )
+     * )
+     */
     public function index(): JsonResponse
     {
         return response()->json([
@@ -29,12 +41,24 @@ class MenuController extends Controller
         return response()->json($menuItem);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/menu/pizza",
+     *     summary="Get all pizzas",
+     *     tags={"Menu"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of pizzas"
+     *     )
+     * )
+     */
     public function getPizzas(): JsonResponse
     {
         return response()->json(
             MenuItem::where('product_type', ProductType::PIZZA)->get()
         );
     }
+
 
     public function getCoffee(): JsonResponse
     {
