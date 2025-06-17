@@ -36,7 +36,7 @@ Route::prefix('menu')->group(function () {
 
 // Protected routes (authorized only)
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', fn(Request $request) => response()->json($request->user()));
+    Route::middleware('auth:sanctum')->get('/user', [AuthController::class, 'getUser']);
 
     // Cart
     Route::prefix('cart')->group(function () {
